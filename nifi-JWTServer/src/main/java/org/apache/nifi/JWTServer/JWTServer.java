@@ -164,7 +164,11 @@ public class JWTServer extends AbstractControllerService implements JWTService {
         boolean isGenerate = context.getProperty(PROP_GEN_SECURE_KEY).getValue().contentEquals(KEY_PROVIDER_GENERATE.getValue());
         String signingAlgo = context.getProperty(PROP_SIGNING_ALGO).getValue();
         if(isGenerate){
-            geneateKey(signingAlgo);
+            KEY.set(Keys.secretKeyFor(getSignatureAlgo(signingAlgo)));
+        }else {
+            if(context.getProperty(PROP_SIGNING_ALGO).getValue().contains("HS")){
+                
+            }
         }
     }
     private final AtomicReference<SecretKey> KEY = new AtomicReference<>();
@@ -177,51 +181,22 @@ public class JWTServer extends AbstractControllerService implements JWTService {
                 return SignatureAlgorithm.HS384;
             case "HS512":
                 return SignatureAlgorithm.HS512;
-            case ""
+            case "RS256":
+                return SignatureAlgorithm.RS256;
+            case "RS384":
+                return SignatureAlgorithm.RS384;
+            case "RS512":
+                return SignatureAlgorithm.RS512;
+            case "ES256":
+                return SignatureAlgorithm.ES256;
+            case "ES384":
+                return SignatureAlgorithm.ES384;
+            case "ES512":
+                return SignatureAlgorithm.ES512;
         }
+        return null;
     }
-    private void geneateKey(String signingAlgo){
-        if(signingAlgo.matches("HS\\d+")){ // HMAC-SHA
-            final int bitLen = Integer.parseInt(signingAlgo.substring(2));
-            switch (bitLen){
-                case 256:
-                    KEY.set(Keys.secretKeyFor(SignatureAlgorithm.HS256));
-                    break;
-                case 384:
-                    KEY.set(Keys.secretKeyFor(SignatureAlgorithm.HS384));
-                    break;
-                case 512:
-                    KEY.set(Keys.secretKeyFor(SignatureAlgorithm.HS512));
-                    break;
-            }
-        } else if(signingAlgo.matches("RS\\d+")) { // RSA or
-            final int bitLen = Integer.parseInt(signingAlgo.substring(2));
-            switch (bitLen){
-                case 256:
-                    KEY.set(Keys.secretKeyFor(SignatureAlgorithm.RS256));
-                    break;
-                case 384:
-                    KEY.set(Keys.secretKeyFor(SignatureAlgorithm.RS384));
-                    break;
-                case 512:
-                    KEY.set(Keys.secretKeyFor(SignatureAlgorithm.RS512));
-                    break;
-            }
-        } else { // Elliptic Curve
-            final int bitLen = Integer.parseInt(signingAlgo.substring(2));
-            switch (bitLen){
-                case 256:
-                    KEY.set(Keys.secretKeyFor(SignatureAlgorithm.ES256));
-                    break;
-                case 384:
-                    KEY.set(Keys.secretKeyFor(SignatureAlgorithm.ES384));
-                    break;
-                case 512:
-                    KEY.set(Keys.secretKeyFor(SignatureAlgorithm.ES512));
-                    break;
-            }
-        }
-    }
+
     @OnDisabled
     public void shutdown() {
 
