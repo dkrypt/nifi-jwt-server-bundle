@@ -16,14 +16,17 @@
  */
 package org.apache.nifi.JWTServer;
 
+import io.jsonwebtoken.JwtBuilder;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.controller.ControllerService;
 import org.apache.nifi.processor.exception.ProcessException;
 
+import java.security.SignatureException;
+
 @Tags({"example"})
 @CapabilityDescription("Example Service API.")
 public interface JWTService extends ControllerService {
-    public void execute()  throws ProcessException;
-
+    public JwtBuilder signJWT(JwtBuilder jwtBuilder);
+    public boolean verifyJWT(String token) throws SignatureException;
 }
